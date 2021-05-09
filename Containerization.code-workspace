@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "01-visits-counter"
 		}
 	],
 	"settings": {}
