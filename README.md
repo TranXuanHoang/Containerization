@@ -8,3 +8,4 @@ This project contains examples showing how to use `containerization` technologie
 |Project |Purpose |Keywords |
 |--------|--------|---------|
 | [visits-counter](./01-visits-counter) | Introduction to `Docker compose` | `Docker compose` |
+| [workflow](02-workflow) | Introduction to `Docker Volume` and `Build Workflows` | `Docker Volume` `Build Workflows` |

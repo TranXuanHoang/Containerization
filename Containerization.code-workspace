@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "01-visits-counter"
+		},
+		{
+			"path": "02-workflow"
 		}
 	],
 	"settings": {}
