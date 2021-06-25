@@ -19,3 +19,13 @@ docker run -p 4000:3000 --rm -v "$(pwd):/app" -v /app/node_modules -e CHOKIDAR_U
 # CMD Prompt
 docker run -p 4000:3000 --rm -v "%cd%:/app" -v /app/node_modules -e CHOKIDAR_USEPOLLING=true --name workflow hoangtrx/workflow:v1.0
 ```
+
+Another way to run the app is by using `Docker compose`. Inside the project root directory, there is a [`docker-compose.yml`](./docker-compose.yml) file that contains the config for runing and stopping the app with the following `Docker compose` commands
+
+```powershell
+# Start the app up
+docker compose up
+
+# Stop the app
+docker compose down
+```
