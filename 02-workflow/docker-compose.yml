@@ -1,0 +1,15 @@
+version: '3'
+services:
+  web: # name of service
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4000:3000" # map port 4000 on local machine to port 3000 inside the container
+    volumes:
+      - /app/node_modules # don't map a volume against /app/node_modules inside the container
+      - .:/app # map the current directory outside the container to the /app directory inside the container
+    environment:
+      - CHOKIDAR_USEPOLLING=true # environment variable for hot reloading source code (need for Windows)
+    container_name: workflow
+    image: workflow:v1.1
