@@ -66,3 +66,16 @@ docker compose up
 # Run test by opening a different terminal and run this command
 docker exec -it -e CHOKIDAR_USEPOLLING=true workflow_test npm run test
 ```
+
+## Production Build and Run
+
+```powershell
+# Build a Docker image for running on Production Environment
+# using the default Dockerfile config
+docker build -t hoangtrx/workflow_prod:v1.0 .
+
+# Run the image
+# Note that the default port of Nginx inside the container is 80,
+# so we map that internal port 80 to our local machine port 8080
+docker run --rm -p 8080:80 --name workflow_prod hoangtrx/workflow_prod:v1.0
+```
