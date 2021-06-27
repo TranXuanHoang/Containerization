@@ -1,5 +1,7 @@
 # Workflow
 
+## Build a Docker Image and Run a Container Based on that Image
+
 ```powershell
 # To build this project with a Dockerfile whose name is Dockerfile.dev
 docker build -f Dockerfile.dev -t hoangtrx/workflow .
@@ -20,6 +22,8 @@ docker run -p 4000:3000 --rm -v "$(pwd):/app" -v /app/node_modules -e CHOKIDAR_U
 docker run -p 4000:3000 --rm -v "%cd%:/app" -v /app/node_modules -e CHOKIDAR_USEPOLLING=true --name workflow hoangtrx/workflow:v1.0
 ```
 
+## Build and Run with Docker Compose
+
 Another way to run the app is by using `Docker compose`. Inside the project root directory, there is a [`docker-compose.yml`](./docker-compose.yml) file that contains the config for runing and stopping the app with the following `Docker compose` commands
 
 ```powershell
@@ -28,4 +32,37 @@ docker compose up
 
 # Stop the app
 docker compose down
+```
+
+## Run Tests
+
+To run test cases,
+
+**Method 1:** Use `docker run` command
+
+```powershell
+# Run tests against source code inside the container-internal /app directory
+docker run -it --rm --name workflow workflow:v1.1 npm run test
+
+# Run tests against source code in the local machine (use volumes bind mount)
+# Note that, we need to run the command under the '02-workflow' directory.
+# And 'workflow:v1.1' is supposed to be created by running
+# 'docker compose up' in the previous section
+docker run -it --rm -v /app/node_modules -v "$(pwd):/app" -e CHOKIDAR_USEPOLLING=true --name workflow workflow:v1.1 npm run test
+```
+
+**Method 2:** Run `docker compose up` to start a container up and then run `docker exec`
+
+```powershell
+# For the first time running Docker compose, run the following
+# command to build a Docker image for the project before starting
+# containers for that Docker image
+docker compose up --build
+
+# From the second time (when there is no changes added to project
+# source code), start the app with Docker compose
+docker compose up
+
+# Run test by opening a different terminal and run this command
+docker exec -it -e CHOKIDAR_USEPOLLING=true workflow_test npm run test
 ```

@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   web: # name of service
     build:
@@ -13,3 +13,16 @@ services:
       - CHOKIDAR_USEPOLLING=true # environment variable for hot reloading source code (need for Windows)
     container_name: workflow
     image: workflow:v1.1
+
+  tests: # create a service called 'tests' for testing purpose
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true # environment variable for hot reloading source code (need for Windows)
+    container_name: workflow_test
+    image: workflow:v1.1
+    command: ["npm", "run", "test"]
