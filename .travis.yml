@@ -4,6 +4,7 @@ services:
   - docker
 
 before_install:
+  - cd ${TRAVIS_BUILD_DIR}/02-workflow
   - docker build -f Dockerfile.dev -t hoangtrx/workflow .
 
 script:
