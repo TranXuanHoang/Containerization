@@ -1,0 +1,15 @@
+sudo: required
+language: generic
+services:
+  - docker
+
+before_install:
+  - cd ${TRAVIS_BUILD_DIR}/02-workflow
+  - docker build -f Dockerfile.dev -t hoangtrx/workflow .
+
+script:
+  # See https://create-react-app.dev/docs/running-tests/#continuous-integration
+  # for more information about the environment variable CI
+  # CI=true means after finishing 'npm test', quit the Jest testing process
+  # -- --coverage is to include a coverage report
+  - docker run -e CI=true hoangtrx/workflow npm test -- --coverage

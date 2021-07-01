@@ -79,3 +79,7 @@ docker build -t hoangtrx/workflow_prod:v1.0 .
 # so we map that internal port 80 to our local machine port 8080
 docker run --rm -p 8080:80 --name workflow_prod hoangtrx/workflow_prod:v1.0
 ```
+
+## Travis CI
+
+A [.travis.yml](../.travis.yml) file was added to config [Travis CI](https://www.travis-ci.com/) as a `continuous integration` tool helping us to automate the build, tests and deployment of the app.
