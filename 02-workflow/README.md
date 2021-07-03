@@ -1,5 +1,7 @@
 # Workflow
 
+[![Build Status](https://www.travis-ci.com/TranXuanHoang/Containerization.svg?branch=workflow)](https://www.travis-ci.com/TranXuanHoang/Containerization)
+
 ## Build a Docker Image and Run a Container Based on that Image
 
 ```powershell
