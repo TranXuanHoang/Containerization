@@ -1,5 +1,7 @@
 # Workflow
 
+[![Build Status](https://www.travis-ci.com/TranXuanHoang/Containerization.svg?branch=workflow)](https://www.travis-ci.com/TranXuanHoang/Containerization)
+
 ## Build a Docker Image and Run a Container Based on that Image
 
 ```powershell
@@ -82,4 +84,4 @@ docker run --rm -p 8080:80 --name workflow_prod hoangtrx/workflow_prod:v1.0
 
 ## Travis CI
 
-A [.travis.yml](./.travis.yml) file was added to config [Travis CI](https://www.travis-ci.com/) as a `continuous integration` tool helping us to automate the build, tests and deployment of the app.
+A [.travis.yml](../.travis.yml) file was added to config [Travis CI](https://www.travis-ci.com/) as a `continuous integration` tool helping us to automate the build, tests and deployment of the app.
