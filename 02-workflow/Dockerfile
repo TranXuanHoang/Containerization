@@ -13,6 +13,10 @@ RUN npm run build
 # Stage 2: Run the app
 FROM nginx
 
+# On local machine, this exposed port doesn't take any effects.
+# However, for AWS Beanstalk the EXPOSE instruction does.
+EXPOSE 80
+
 # Copy built resources (html, javascript, ...) generated in
 # the previous stage to the '/usr/share/nginx/html' directory
 COPY --from=builder /app/build /usr/share/nginx/html
