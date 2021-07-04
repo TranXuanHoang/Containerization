@@ -2,6 +2,14 @@
 
 [![Build Status](https://www.travis-ci.com/TranXuanHoang/Containerization.svg?branch=workflow)](https://www.travis-ci.com/TranXuanHoang/Containerization)
 
+## Source Code
+
+Switch the source code to the version described below to view its implementation.
+
+| Git Tag | Git Diff | Implementation |
+|---------|----------|----------------|
+| [v2.0.0](https://github.com/TranXuanHoang/Containerization/releases/tag/v2.0.0) | [diff](https://github.com/TranXuanHoang/Containerization/compare/v1.0.0...v2.0.0) | Build a *single* `container` web app with a deployment workflow using Travis CI |
+
 ## Build a Docker Image and Run a Container Based on that Image
 
 ```powershell
