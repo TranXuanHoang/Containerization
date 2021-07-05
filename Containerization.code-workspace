@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "02-workflow"
+		},
+		{
+			"path": "03-fibonacci"
 		}
 	],
 	"settings": {}
