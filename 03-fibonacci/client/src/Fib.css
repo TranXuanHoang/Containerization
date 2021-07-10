@@ -1,0 +1,33 @@
+.Form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+input {
+  padding: 0.5rem 1.5rem;
+  font-size: 1.2rem;
+  outline: none;
+  border-radius: 20rem;
+  border: none;
+  color: chocolate;
+}
+
+button {
+  padding: 0.4rem 1rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 0.1rem;
+  max-width: max-content;
+}
+
+button:hover {
+  color: white;
+  background: chocolate;
+  cursor: pointer;
+}
+
+.Error {
+  color: red;
+}
