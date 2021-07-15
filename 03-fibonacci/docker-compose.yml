@@ -2,18 +2,38 @@ version: '3'
 services:
   postgres: # can be any name (here we chose postgres)
     image: postgres:latest
+    container_name: fibonacci_postgres
     environment:
       - POSTGRES_PASSWORD=postgres_password
 
   redis:
     image: redis:latest
+    container_name: fibonacci_redis
+
+  nginx: # can use any other name
+    # specify service that Nginx container depends on to avoid error:
+    # connect() failed (111: Connection refused) while connecting to upstream,
+    # client:[DOCKER INTERNAL IP], server:, request: "GET / HTTP/1.1", upstream: [NETWORK IP]
+    depends_on:
+      - api
+      - client
+    restart: always # routing entirely traffic
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3050:80' # map port 3050 on local machine to port 80 inside container
 
   api:
+    restart: always # restart when it crashed and was stopped
     build:
       context: ./server # use ./server directory to build the image
       dockerfile: Dockerfile.dev
-    ports:
-      - '5000:5000'
+    # No need to expose port if we only rely on Nginx to communicate with the api server.
+    # Uncomment the following port config to enable direct calling of localhost:5000/api/...
+    # on local machine
+    # ports:
+    #   - '5000:5000'
     volumes:
       - /app/node_modules
       - ./server:/app # bind mount the '/app' directory inside the container to the './server' directory in our local machine
@@ -34,8 +54,11 @@ services:
     build:
       dockerfile: Dockerfile.dev
       context: ./client
-    ports:
-      - 3000:3000
+    # No need to expose port if we only rely on Nginx to communicate with the client container.
+    # Uncomment the following port config to enable direct calling of localhost:3000
+    # on local machine
+    # ports:
+    #   - '3000:3000'
     volumes:
       - /app/node_modules
       - ./client:/app
