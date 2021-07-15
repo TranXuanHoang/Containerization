@@ -1,0 +1,66 @@
+version: '3'
+services:
+  postgres: # can be any name (here we chose postgres)
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+
+  redis:
+    image: redis:latest
+
+  api:
+    build:
+      context: ./server # use ./server directory to build the image
+      dockerfile: Dockerfile.dev
+    ports:
+      - '5000:5000'
+    volumes:
+      - /app/node_modules
+      - ./server:/app # bind mount the '/app' directory inside the container to the './server' directory in our local machine
+    environment:
+      - CHOKIDAR_USEPOLLING=true # environment variable for hot reloading source code (need for Windows)
+      - REDIS_HOST=redis # name of the service configured above
+      - REDIS_PORT=6379 # default port of redis is 6379
+      - PGUSER=postgres
+      - PGHOST=postgres # name of the service configured above
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password # same password set for the env POSTGRES_PASSWORD above
+      - PGPORT=5432 # default port of postgres is 5432
+    image: fibonacci_server
+    container_name: fibonacci_server
+
+  client:
+    stdin_open: true # avoid "React App exited with Code 0" error in the terminal when attempting to start up the app
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    ports:
+      - 3000:3000
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true # environment variable for hot reloading source code (need for Windows)
+    image: fibonacci_client
+    container_name: fibonacci_client
+
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true # environment variable for hot reloading source code (need for Windows)
+      - REDIS_HOST=redis # name of the service configured above
+      - REDIS_PORT=6379 # default port of redis is 6379
+    image: fibonacci_worker
+    container_name: fibonacci_worker
+
+  # DB Administration Tool
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
