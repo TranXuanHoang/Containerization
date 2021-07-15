@@ -66,7 +66,10 @@ app.get('/values/all', async (req, res) => {
 // Retrieve current value submitted from the client React app
 app.get('/values/current', async (req, res) => {
   redisClient.hgetall('values', (err, values) => {
-    res.send(values)
+    if (err) {
+      return res.send({})
+    }
+    res.send(values ? values : {})
   })
 })
 
