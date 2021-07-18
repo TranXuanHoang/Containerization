@@ -3,33 +3,32 @@ language: generic
 services:
   - docker
 
-before_install:
-  - cd ${TRAVIS_BUILD_DIR}/02-workflow
-  - docker build -f Dockerfile.dev -t hoangtrx/workflow .
-
-script:
-  # See https://create-react-app.dev/docs/running-tests/#continuous-integration
-  # for more information about the environment variable CI
-  # CI=true means after finishing 'npm test', quit the Jest testing process
-  # -- --coverage is to include a coverage report
-  - docker run -e CI=true hoangtrx/workflow npm test -- --coverage
-
 branches:
   only:
-    - workflow # only run Travis CI when the branch 'workflow' was updated
+    - fibonacci # only run Travis CI when the branch 'fibonacci' was updated
 
-deploy:
-  provider: elasticbeanstalk
-  region: "ap-northeast-1"
-  app: "workflow"
-  env: "Workflow-env"
-  # bucket_name in this config is the name of AWS S3 bucket
-  # automatically created when creating a new Elastic Beanstalk app
-  bucket_name: "elasticbeanstalk-ap-northeast-1-313893802357"
-  bucket_path: "workflow" # normally bucket_path is the same as 'app'
-  on:
-    branch: workflow # only deploy when the 'workflow' branch is updated
-  # AWS access and secret keys
-  access_key_id: "$AWS_ACCESS_KEY_ID"
-  secret_access_key: "$AWS_SECRET_ACCESS_KEY"
-  edge: true
+before_install:
+  - cd ${TRAVIS_BUILD_DIR}/03-fibonacci
+  # Build a Docker image specifically used for unit tests
+  - docker build -f ./client/Dockerfile.dev -t hoangtrx/fibonacci_client_test ./client
+
+script:
+  # Run unit tests
+  - docker run -e CI=true hoangtrx/fibonacci_client_test npm test -- --coverage
+
+# After all unit tests was successful, build Docker images for
+# all services
+after_success:
+  - docker build -t hoangtrx/fibonacci_client ./client
+  - docker build -t hoangtrx/fibonacci_nginx ./nginx
+  - docker build -t hoangtrx/fibonacci_server ./server
+  - docker build -t hoangtrx/fibonacci_worker ./worker
+
+  # Login to the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # Push those images to Docker hub
+  - docker push hoangtrx/fibonacci_client
+  - docker push hoangtrx/fibonacci_nginx
+  - docker push hoangtrx/fibonacci_server
+  - docker push hoangtrx/fibonacci_worker
