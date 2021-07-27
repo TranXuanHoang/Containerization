@@ -1,0 +1,34 @@
+sudo: required
+language: generic
+services:
+  - docker
+
+branches:
+  only:
+    - fibonacci # only run Travis CI when the branch 'fibonacci' was updated
+
+before_install:
+  - cd ${TRAVIS_BUILD_DIR}/03-fibonacci
+  # Build a Docker image specifically used for unit tests
+  - docker build -f ./client/Dockerfile.dev -t hoangtrx/fibonacci_client_test ./client
+
+script:
+  # Run unit tests
+  - docker run -e CI=true hoangtrx/fibonacci_client_test npm test -- --coverage
+
+# After all unit tests was successful, build Docker images for
+# all services
+after_success:
+  - docker build -t hoangtrx/fibonacci_client ./client
+  - docker build -t hoangtrx/fibonacci_nginx ./nginx
+  - docker build -t hoangtrx/fibonacci_server ./server
+  - docker build -t hoangtrx/fibonacci_worker ./worker
+
+  # Login to the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # Push those images to Docker hub
+  - docker push hoangtrx/fibonacci_client
+  - docker push hoangtrx/fibonacci_nginx
+  - docker push hoangtrx/fibonacci_server
+  - docker push hoangtrx/fibonacci_worker

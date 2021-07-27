@@ -4,6 +4,7 @@ services:
   - docker
 
 before_install:
+  - cd ${TRAVIS_BUILD_DIR}/02-workflow
   - docker build -f Dockerfile.dev -t hoangtrx/workflow .
 
 script:
@@ -12,3 +13,23 @@ script:
   # CI=true means after finishing 'npm test', quit the Jest testing process
   # -- --coverage is to include a coverage report
   - docker run -e CI=true hoangtrx/workflow npm test -- --coverage
+
+branches:
+  only:
+    - workflow # only run Travis CI when the branch 'workflow' was updated
+
+deploy:
+  provider: elasticbeanstalk
+  region: "ap-northeast-1"
+  app: "workflow"
+  env: "Workflow-env"
+  # bucket_name in this config is the name of AWS S3 bucket
+  # automatically created when creating a new Elastic Beanstalk app
+  bucket_name: "elasticbeanstalk-ap-northeast-1-313893802357"
+  bucket_path: "workflow" # normally bucket_path is the same as 'app'
+  on:
+    branch: workflow # only deploy when the 'workflow' branch is updated
+  # AWS access and secret keys
+  access_key_id: "$AWS_ACCESS_KEY_ID"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY"
+  edge: true
