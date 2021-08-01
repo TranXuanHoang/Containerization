@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-node-port
+spec:
+  type: NodePort
+  ports:
+    - port: 3050 # port exposed to other Pods running in the same K8s cluster
+      targetPort: 3000 # actual port on which the app is running inside the container (port opened up inside the target pod)
+      nodePort: 31515 # port exposed to the outside world (browsers can use this port to access app)
+  selector:
+    component: web
