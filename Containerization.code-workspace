@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "03-fibonacci"
+		},
+		{
+			"path": "04-fibonacci-k8s"
 		}
 	],
 	"settings": {}
