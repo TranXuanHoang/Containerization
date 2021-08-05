@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            # claimName is defined in database-persistent-volume-claim.yaml file
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432 # default port of postgres is 5432
+          volumeMounts:
+            - name: postgres-storage # same name as the above spec.volumes[0].name
+              # the location PostgresSQL saves its data will be
+              # mounted to the persistent volume
+              mountPath: /var/lib/postgresql/data
+              # all data saved in mountPath is saved in 'postgres'
+              # inside the Persistent Volume
+              subPath: postgres
+          env:
+            - name: POSTGRES_PASSWORD # need to use this name as it is the default name Postgres can understand
+              valueFrom:
+                secretKeyRef:
+                  # Secret was created with the following k8s command
+                  # kubectl create secret generic pgpassword --from-literal PGPASSWORD=1234asdf
+                  # Here, we get that secret value and pass to the app logic
+                  name: pgpassword
+                  key: PGPASSWORD
