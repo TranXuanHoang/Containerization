@@ -14,4 +14,45 @@ Switch the source code to the version described below to view its implementation
 
 ## Run App
 
+### Create secrets
+
+```powershell
+# Create a secret containing the password that will be used to connect to the PostgreSQL DB
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=1234asdf
+
+# List out secrets created
+kubectl get secrets
+```
+
+Note that we reference to that secret inside a `K8s Deployment` like below
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: image_name
+          ports:
+            - containerPort: 5000
+          env:
+            - ... OTHER ENV VARS ...
++           - name: PGPASSWORD # env var name used inside the app logic
++             valueFrom:
++               secretKeyRef:
++                 name: pgpassword # secret name
++                 key: PGPASSWORD # secret key in the 'key=value' pair
+```
+
 ## Stop App

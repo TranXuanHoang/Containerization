@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: hoangtrx/fibonacci_server
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              # the name of the redis cluster ip service defined in redis-cluster-ip-service.yaml
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: '6379' # need to put integer value in quote for env vars
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: '5432' # need to put integer value in quote for env vars
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # Secret was created with the following k8s command
+                  # kubectl create secret generic pgpassword --from-literal PGPASSWORD=1234asdf
+                  # Here, we get that secret value and pass to the app logic
+                  name: pgpassword
+                  key: PGPASSWORD
