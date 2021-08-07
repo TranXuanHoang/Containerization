@@ -55,4 +55,29 @@ spec:
 +                 key: PGPASSWORD # secret key in the 'key=value' pair
 ```
 
+### Apply `K8s` config files
+
+```powershell
+kubectl apply -f ./k8s
+```
+
+Then open the web app at [https://localhost](https://localhost) (type `thisisunsafe` when Chrome browser warns untrusted site due to the SSL certificate is not real on the `local` Docker Desktop's Kubernetes environment)
+
 ## Stop App
+
+Run the following command to shutdown the entire `K8s` infrastructure built with the `K8s apply` command
+
+```powershell
+kubectl delete -f ./k8s
+```
+
+## Kubernetes Dashboard
+
+Setup a [Kubernetes Dashboard](https://github.com/kubernetes/dashboard) to help us check the status and logs of all `Pods`, `Services`, `Ingress`, ... running inside our K8s Cluster with a web-based GUI.
+
+```powershell
+# Apply config files inside the k8s-dashboard directory to
+# - setup a Kubernetes Dashboard (kubernetes-dashboard.yaml)
+# - and create a user to login to the Dashboard (dashboard-adminuser.yaml)
+kubectl apply -f ./k8s-dashboard
+```
