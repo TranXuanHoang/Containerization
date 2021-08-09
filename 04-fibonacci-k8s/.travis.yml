@@ -1,0 +1,64 @@
+## This Travis CI config file sets up steps to build and deploy the entire app
+## to a Google Cloud Kubenetes Cluster
+
+sudo: required
+language: generic
+services:
+  - docker
+
+branches:
+  only:
+    - fibonacci-k8s # only run Travis CI when the branch 'fibonacci-k8s' was updated
+
+env:
+  global:
+    # Get the commit hash of the current HEAD
+    - SHA=$(git rev-parse HEAD)
+    # Disable any popup message prompting for confirmation
+    # as we are automate the deployment process
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+
+before_install:
+  # The following openssl command is obtained after running the Travis CI command below
+  #   travis login --github-token YOUR_PERSONAL_TOKEN --com
+  #   travis encrypt-file service-account.json -r USERNAME/REPO --com
+  # or
+  #   travis login --github-token YOUR_PERSONAL_TOKEN --pro
+  #   travis encrypt-file service-account.json -r USERNAME/REPO --pro
+  # For more information about Github personal access token, see
+  # https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token
+  # This will also require setting the scope. Travis requires the permissions noted here:
+  # https://docs.travis-ci.com/user/github-oauth-scopes/#repositories-on-httpstravis-cicom-private-and-public
+  #
+  # To get a service-account.json file, from Google Cloud Console
+  # see ./GoogleServiceAccount.pdf
+  - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
+
+  # Install Google Cloud SDK on Travis instance server
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - source $HOME/google-cloud-sdk/path.bash.inc
+
+  # Install and update Kubernetes
+  - gcloud components update kubectl
+
+  # Authenticate Google Cloud
+  - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud config set project <google-cloud-project-id> # e.g. fibo-calc-93scd
+  - gcloud config set compute/zone <goole-cloud-zone> # e.g. us-central1-c
+  - gcloud container clusters get-credentials <gke-cluster-name> # e.g. fibo-calc
+
+  # Login to Docker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # Build a client image for unit testing
+  - docker build -t hoangtrx/fibonacci_client_test -f ./client/Dockerfile.dev ./client
+
+script:
+  # Run unit tests for the client app
+  - docker run -e CI=true hoangtrx/fibonacci_client_test npm test -- --coverage
+
+deploy:
+  provider: script # deploy with a shell script
+  script: bash ./deploy.sh # run deploy.sh shell script
+  on:
+    branch: fibonacci-k8s # only run if the branch updated is 'fibonacci-k8s'
