@@ -1,0 +1,39 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+deploy:
+  kubectl:
+    manifests:
+    - ./k8s/*
+    - ./k8s-dashboard/*
+build:
+  local:
+    push: false # avoid pushing images to Docker Hub everytime rebuild images
+  artifacts:
+    - image: hoangtrx/fibonacci_client
+      context: client
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: 'src/**/*.js'
+            dest: .
+          - src: 'src/**/*.css'
+            dest: .
+          - src: 'src/**/*.html'
+            dest: .
+    - image: hoangtrx/fibonacci_server
+      context: server
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: '*.js'
+            dest: .
+    - image: hoangtrx/fibonacci_worker
+      context: worker
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        manual:
+          - src: '*.js'
+            dest: .
