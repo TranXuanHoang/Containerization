@@ -10,4 +10,24 @@ Switch the source code to the version described below to view its implementation
 
 | Git Tag | Git Diff | Implementation |
 |---------|----------|----------------|
-| [v5.0.1](https://github.com/TranXuanHoang/Containerization/releases/tag/v5.0.1) | [diff](https://github.com/TranXuanHoang/Containerization/compare/v5.0.0...v5.0.1) | Build a `multiple-container` web app with `Kubernetes` |
+| [v5.0.1](https://github.com/TranXuanHoang/Containerization/releases/tag/v5.0.1) | [diff](https://github.com/TranXuanHoang/Containerization/compare/v5.0.0...v5.0.1) | Create a `multiple-container` web app with `Docker Compose` |
+
+## Build and Run App
+
+```powershell
+# Build app the first time, and then run it
+docker compose up --build
+
+# Or run in detached mode
+docker compose up --build -d
+
+# From the second time, we can ommit the --build flag
+docker compose up
+docker compose up -d     # run in detached mode
+
+# Shutdown app (without deleting database data)
+docker compose down
+
+# Shutdown app and delete database data (saved in a named volume)
+docker compose down -v
+```
