@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "4.17.1",
     "mongoose": "5.13.7",
-    "morgan": "1.10.0"
+    "morgan": "1.10.0",
+    "nodemon": "2.0.12"
   }
 }
