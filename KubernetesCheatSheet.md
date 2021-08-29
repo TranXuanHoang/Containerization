@@ -42,6 +42,43 @@ kubectl set <property> <object_type>/<object_name> <container_name>=<new_value>
 # Example: updating Docker image of a running Pod that has container running inside
 kubectl set image deployment/<object_name> <container_name>=<new_image_to_use>
 kubectl set image deployment/client-deployment client=hoangtrx/fibonacci_client:v1
+
+# Then, to check the update status
+kubectl rollout status <object_type>/<object_name>
+kubectl rollout status deployment/client-deployment
+```
+
+### Rollback deployment and history
+
+```powershell
+# If we need to rollback a deployment that was updated by 'kubectl set image ...'
+# in the above section, we can use the following command:
+kubectl rollout undo <object_type>/<object_name>
+kubectl rollout undo deployment/client-deployment
+# The above command will undo the latest deployment
+
+# If we need to rollback to a specific deployment in the past,
+# first we can check deployment history with
+kubectl rollout history <object_type>/<object_name>
+kubectl rollout history deployment/client-deployment
+# The above command will print out something like this
+#   REVISION  CHANGE-CAUSE
+#   1         <none>
+#   3         <none>
+# We can even use --revision to check details of a specific deployment in the past
+kubectl rollout history deployment/client-deployment --revision=3
+# The above command will show details of the deployment whose REVISION identifier is 3
+# We can check the image and its tag that was used during that deployment
+# and use that information to rollback by running the following command
+kubectl rollout undo <object_type>/<object_name> --to-revision=<REVISION_IDENTIFIER>
+kubectl rollout undo deployment/client-deployment --to-revision=1
+# The above command will rollback to revision 1
+```
+
+### Expose pods of a deployment to the outside world with an imperative approach
+
+```powershell
+kubectl expose deployment <deployment_object_name> --port=<PORT_INSIDE_CONTAINER_TO_BE_EXPOSED> --type=<LoadBalancer|NodePort>
 ```
 
 ### Fetch a list of objects
@@ -266,6 +303,36 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 kubectl get svc -n ingress-nginx
 kubectl get pods -n ingress-nginx
 ```
+
+## Custom health check
+
+To add a custom configuration to let `K8s` know how it should check if a group of `Pods` managed by a `Deployment` is still running normally, we can add a `livenessProbe` under `.spec.template.spec.containers[index]` like below. We can then specify the health-check API endpoint via `livenessProbe.httpGet`, specify how often `K8s` should call the API with `livenessProbe.periodSeconds`.
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  ...
+spec:
+  replicas: <number_of_pod_instances>
+  selector:
+    ...
+  template:
+    ...
+    spec:
+      containers:
+        - name: <container_name>
+          image: <dockerhub_username>/<image_name>
+          imagePullPolicy: Always
++         livenessProbe:
++           httpGet:
++             path: /
++             port: 8080
++           periodSeconds: 10
++           initialDelaySeconds: 5
+```
+
+See [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) for more information.
 
 ## Kubernetes Dashboard
 
