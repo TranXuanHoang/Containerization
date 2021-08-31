@@ -12,6 +12,7 @@ This project contains examples showing how to use `containerization` technologie
 | [fibonacci](03-fibonacci) | Build a `Fibonacci` calculator with a `multi-container` architecture | `Docker compose` `communication between containers` |
 | [fibonacci-k8s](04-fibonacci-k8s) | Build a `Fibonacci` calculator with a `multi-container` architecture using `Kubernetes` to orchestrate containers and setup networking | `Kubernetes` |
 | [goals](05-goals) | Create a `multi-container` web app with `Docker Compose` | `Networking` `database data persistency` |
+| [notes](06-notes) | Make a backend API server and deploy it with `Kubernetes` (use `K8s` `Volumes` to persist data) | `K8s Volume` |
 
 ## Cheat Sheets
 
