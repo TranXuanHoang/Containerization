@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  notes-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hoangtrx/notes-app
+    container_name: notes-app
+    ports:
+      - '4000:3000' # map port 4000 on local machine to port 3000 inside container
+    volumes:
+      - notes-volume:/app/notes
+
+volumes:
+  notes-volume:
