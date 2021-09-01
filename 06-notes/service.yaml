@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: notes-app
+  ports:
+    - port: 4000 # port exposed to the outside local machine
+      # port that the container(s) running inside the Pod
+      # managed by this service is listening
+      targetPort: 3000
+      protocol: "TCP"

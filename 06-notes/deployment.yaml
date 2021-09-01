@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-deployment
+spec:
+  selector:
+    matchLabels:
+      app: notes-app
+  template:
+    metadata:
+      labels:
+        app: notes-app
+    spec:
+      containers:
+        - name: notes-app
+          image: hoangtrx/notes-app
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+              # Path within the container at which the volume should be mounted.
+              # Must not contain ':'.
+            - mountPath: /app/notes
+              # Name must be the same as the volume defined in the 'volumes' below
+              name: notes-volume
+      volumes:
+        - name: notes-volume
+          # EmptyDir represents a temporary directory that shares a pod's lifetime.
+          # Meaning that it is only there while the pod is running.
+          emptyDir: {}

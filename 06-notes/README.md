@@ -23,6 +23,19 @@ docker compose down
 docker compose down -v
 ```
 
+## Deploy the app locally with Kubernetes
+
+```powershell
+# Start the app up, or apply new configs to the K8s Deployment and Service objects
+kubectl apply -f deployment.yaml -f service.yaml
+
+# Then open app on local machine at
+localhost:4000
+
+# Take the app down
+kubectl delete -f deployment.yaml -f service.yaml
+```
+
 ## Interact with the app
 
 After the app is started up and running, use Postman to call the following APIs
@@ -40,5 +53,7 @@ POST http://localhost:4000/notes
 # Cause the container running inside the pod crash
 # -> If app was started with Docker Compose:
 #    the app will be stopped (notes-app exited with code 1)
+# -> If app was started with K8s:
+#    pod will be restarted
 GET http://localhost:4000/error
 ```

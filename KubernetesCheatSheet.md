@@ -138,6 +138,8 @@ kubectl exec -it <pod_name> -- sh
 | Persistent Volume | Common file system storage in the `host local machine` and are separate from the `K8s Pod`s. Ideal for persisting data even when `Pod`s or `Container`s are terminated/restarted |
 | Persistent Volume Claim | A *billboard* advertising different `Persistent Volume` options that `Pod`s can use |
 
+### Persistent Volumes and Persistent Volume Claims
+
 ```powershell
 # To list all Persistent Volumes
 kubectl get pv
@@ -187,6 +189,48 @@ spec:
 +             # all data saved in mountPath is saved in 'postgres'
 +             # inside the Persistent Volume
 +             subPath: postgres
+```
+
+### `emptyDir` Volumes
+
+An [emptyDir volume](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) is first created when a `Pod` is assigned to a node, and exists as long as that `Pod` is running on that node. As the name says, the `emptyDir` volume is initially empty. All `containers` in the `Pod` can read and write the same files in the `emptyDir` volume, though that volume can be mounted at the same or different paths in each container. When a `Pod` is removed from a node for any reason, the data in the `emptyDir` is deleted permanently.
+
+Example config of an `emptyDir` volume:
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <deployment-name>
+spec:
+  selector:
+    matchLabels:
+      app: <app-label>
+  template:
+    metadata:
+      labels:
+        app: <app-label>
+    spec:
+      containers:
+        - name: <container-name>
+          image: <docker-id>/<image-name>
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 3000
++         volumeMounts:
++             # Path within the container at which the volume should be mounted.
++             # Must not contain ':'.
++           - mountPath: /app/container/internal/dir
++             # Name must be the same as the volume defined in the 'volumes' below
++             name: <volume-name>
++     volumes:
++       - name: <volume-name>
++         # EmptyDir represents a temporary directory that shares a pod's lifetime.
++         # Meaning that it is only there while the pod is running.
++         emptyDir: {}
 ```
 
 ## Environment Variables
