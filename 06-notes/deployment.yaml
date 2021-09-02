@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: notes-deployment
 spec:
+  replicas: 2
   selector:
     matchLabels:
       app: notes-app
@@ -28,6 +29,19 @@ spec:
               name: notes-volume
       volumes:
         - name: notes-volume
-          # EmptyDir represents a temporary directory that shares a pod's lifetime.
-          # Meaning that it is only there while the pod is running.
-          emptyDir: {}
+          # HostPath represents a pre-existing file or directory on the
+          # host machine that is directly exposed to the container
+          hostPath:
+            # On Windows, set the path for directory
+            #    C:/Users/user.name/mydir
+            # to
+            #    /run/desktop/mnt/host/c/Users/user.name/mydir
+            path: "/run/desktop/mnt/host/c/Users/hoang.tran/Desktop/Home/Workplace/Containerization/06-notes/notes"
+            type: DirectoryOrCreate
+      # Uncomment the following piece of config to use an 'emptyDir' volume instead.
+      # In such case, also change the 'replicas' (see spec.replicas above) to 1
+      # volumes:
+      #   - name: notes-volume
+      #     # EmptyDir represents a temporary directory that shares a pod's lifetime.
+      #     # Meaning that it is only there while the pod is running.
+      #     emptyDir: {}

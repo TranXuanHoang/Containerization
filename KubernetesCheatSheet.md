@@ -130,7 +130,7 @@ kubectl delete <object type/kind> <object name>
 kubectl exec -it <pod_name> -- sh
 ```
 
-## Volume in Kubernetes
+## Storage in Kubernetes
 
 | Type/Kind | Description |
 |-----------|-------------|
@@ -191,9 +191,16 @@ spec:
 +             subPath: postgres
 ```
 
-### `emptyDir` Volumes
+### `Volumes`
 
-An [emptyDir volume](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) is first created when a `Pod` is assigned to a node, and exists as long as that `Pod` is running on that node. As the name says, the `emptyDir` volume is initially empty. All `containers` in the `Pod` can read and write the same files in the `emptyDir` volume, though that volume can be mounted at the same or different paths in each container. When a `Pod` is removed from a node for any reason, the data in the `emptyDir` is deleted permanently.
+| Type/Kind | Description |
+|-----------|-------------|
+| [emptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) | Created when a `Pod` is assigned to a `node`, and exists as long as that `Pod` is running on that `node`. All containers running inside that `Pod` can read and write the same files in the `emptyDir` volume. Survival when the containers are restarted but removed when the `Pod` is restarted. |
+| [hostPath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath) | Mounts a file or directory from the **host** `node's filesystem` into your `Pod`. Can be used to let containers inside different `Pod`s running inside the same `node` read from or write to the `file` or directory of the **host** `node's filesystem` (the host machine filesystem). |
+
+#### `emptyDir` Volumes
+
+An [`emptyDir` volume](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) is first created when a `Pod` is assigned to a node, and exists as long as that `Pod` is running on that node. As the name says, the `emptyDir` volume is initially empty. All `containers` in the `Pod` can read and write the same files in the `emptyDir` volume, though that volume can be mounted at the same or different paths in each container. When a `Pod` is removed from a node for any reason, the data in the `emptyDir` is deleted permanently.
 
 Example config of an `emptyDir` volume:
 
@@ -214,10 +221,7 @@ spec:
       containers:
         - name: <container-name>
           image: <docker-id>/<image-name>
-          resources:
-            limits:
-              memory: "128Mi"
-              cpu: "500m"
+          ...
           ports:
             - containerPort: 3000
 +         volumeMounts:
@@ -231,6 +235,54 @@ spec:
 +         # EmptyDir represents a temporary directory that shares a pod's lifetime.
 +         # Meaning that it is only there while the pod is running.
 +         emptyDir: {}
+```
+
+#### `hostPath` Volumes
+
+[`hostPath` volumes](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath) represents a pre-existing file or directory on the host machine that is directly exposed to the container. This is generally used for system agents or other privileged things that are allowed to see the host machine. Most containers will NOT need this. Different `Pod`s in the same `node` (normally `node` = `machine`) that the `hostPath volume` was created will be able to access the same `hostPath volume` and the `hostPath volume` itself survives even though these `Pod`s are restarted. However each `hostPath volume` is only created for a specific `node`, `Pod`s in different `node`s will not share the same `hostPath volume`.
+
+Example `hostPath` volume config:
+
+```yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: <deployment-name>
+spec:
+  selector:
+    matchLabels:
+      app: <app-label>
+  template:
+    metadata:
+      labels:
+        app: <app-label>
+    spec:
+      containers:
+        - name: <container-name>
+          image: <docker-id>/<image-name>
+          ...
+          ports:
+            - containerPort: 3000
++         volumeMounts:
++             # Path within the container at which the volume should be mounted.
++             # Must not contain ':'.
++           - mountPath: /app/container/internal/dir
++             # Name must be the same as the volume defined in the 'volumes' below
++             name: <volume-name>
++     volumes:
++       - name: <volume-name>
++         # HostPath represents a pre-existing file or directory on the
++         # host machine that is directly exposed to the container
++         hostPath:
++           # Directory location on host
++           # On Windows, set the path for directory
++           #    C:/Users/user.name/mydir
++           # to
++           #    /run/desktop/mnt/host/c/Users/user.name/mydir
++           # path: "/run/desktop/mnt/host/c/Users/user.name/mydir"
++           path: /data # this '/data' path is appropriate for only macOS/Linux
++           # If nothing exists at the given path, an empty directory will be created
++           type: DirectoryOrCreate
 ```
 
 ## Environment Variables
