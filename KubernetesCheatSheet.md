@@ -383,6 +383,63 @@ spec:
 +                 key: PGPASSWORD
 ```
 
+## Networking
+
+### Communicate between containers running inside the same `Pod`
+
+`localhost` and `port` can be used to form a URL to let two containers communicate with each other if they are running inside the same `Pod`
+
+### Communicate between containers running in different `Pods`
+
+If we have a `K8s Service` configured as follows:
+
+```powershell
+# Service A for Pod A
+apiVersion: v1
+kind: Service
+metadata:
+  # We can connect to the container(s) running inside pods managed by this service
+  # by one of the following 2 methods
+  # [Method 1] http://SERVICE_A_SERVICE_HOST:5000/api-a-endpoint
+  # [Method 2] http://service-a.default:5000/api-a-endpoint
+  name: service-a
+spec:
+  type: ClusterIP
+  selector:
+    # this is the label defined in the deployment.yaml of the api-a
+    component: api-a
+  ports:
+      # the port that other Pods can use to access this ClusterIP service
+    - port: 5000
+      # the port that the container(s) running inside the Pod
+      # managed by this ClusterIP service is listening
+      targetPort: 5000
+```
+
+there will be two basic methods to make the communication between the `Pod` managed by the defined `Service` and other `Pods` (managed by other `Services`)
+
+#### Method 1: Use built-in `SERVICENAME_IN_UPPERCASE` concatinated with `_SERVICE_HOST`
+
+`K8s` automatically creates an environment variable `SERVICE_A_SERVICE_HOST` (uppercase service name with underscore combined with `_SERVICE_HOST`) whose value will be the `IP address` of the `Service` to which other containers in other `Pods` can use to connect to the container(s) running inside the `Pod`(s) managed by this `Service`.
+
+#### Method 2: Use `service-name.namespace:<port>`
+
+`K8s` also create a `domain name` (only valid inside the `K8s Cluster`) in a form of `service-name.namespace:<port>` (e.g, `service-a.default:5000`) that can be used by other `Pods` to connect to the `Service`. To find the `namespace` to which the `Service` (and `Deployment`) is (are) assigned, run the following command:
+
+```powershell
+kubectl get namespaces
+
+NAME              STATUS   AGE
+default           Active   144d
+ingress-nginx     Active   144d
+kube-node-lease   Active   144d
+kube-public       Active   144d
+kube-system       Active   144d
+
+# Normally the namespace is 'default' if we don't change the
+# default setting of the namespace
+```
+
 ## Ingress
 
 To handle traffic comming from the world outside `K8s Cluster`, we use `Ingress service` with an `Ingress controller` called [NGINX Ingress Controller](https://github.com/kubernetes/ingress-nginx). There is also another `Ingress controller` with the same name and uses the same `Nginx` - its source code repose can be found [here](https://github.com/nginxinc/kubernetes-ingress).
