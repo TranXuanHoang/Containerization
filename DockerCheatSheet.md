@@ -208,3 +208,31 @@ ENV <ENVIRONMENT_VAR_1> $ARGUMENT_NAME_1
 docker build --build-arg ENVIRONMENT_VAR_1=NEW_DEFAULT_VALUE_1 \
   --build-arg ENVIRONMENT_VAR_2=NEW_DEFAULT_VALUE_2 ...
 ```
+
+## Run docker container as utility tools
+
+To spin up a MongoDB and connect to it with a Mongo Shell
+
+```powershell
+# Start a container with a MongoDB server running inside.
+# Use a Docker named volume to save the data of the database
+# so that later, even if the container is shutdown and restarted
+# again, data will be recoveried.
+docker run --rm -it -v mongo-data:/data/db --name mongodb mongo
+
+# Open a Mongo Shell and connect to the MongoDB started up with the above command
+docker exec -it mongodb mongo
+
+## To import data from a JSON file into a collection of a database
+
+# 1. After start a MongoDB server with the above commands, run the following
+# command to copy a source data in JSON format into the running 'mongodb' container
+docker cp <data.json> <container-name-or-id>:/tmp/<data.json>
+docker cp persons.json mongodb:/tmp/persons.json
+
+# 2. Then, use 'mongoimport' command to import the data from the JSON file to the database
+# E.g., To import JSON file into a collection (movieStart) of a database (boxOffice)
+# mongoimport --file=movieStarts.json --jsonArray --drop --db=boxOffice --collection=movieStarts
+docker exec mongodb mongoimport --file=/tmp/<data.json> --jsonArray --drop --db=<database-name> --collection=<collection-name>
+docker exec mongodb mongoimport --file=/tmp/persons.json --jsonArray --drop --db=population --collection=persons
+```
