@@ -211,6 +211,8 @@ docker build --build-arg ENVIRONMENT_VAR_1=NEW_DEFAULT_VALUE_1 \
 
 ## Run docker container as utility tools
 
+### MongoDB
+
 To spin up a MongoDB and connect to it with a Mongo Shell
 
 ```powershell
@@ -235,4 +237,31 @@ docker cp persons.json mongodb:/tmp/persons.json
 # mongoimport --file=movieStarts.json --jsonArray --drop --db=boxOffice --collection=movieStarts
 docker exec mongodb mongoimport --file=/tmp/<data.json> --jsonArray --drop --db=<database-name> --collection=<collection-name>
 docker exec mongodb mongoimport --file=/tmp/persons.json --jsonArray --drop --db=population --collection=persons
+```
+
+### Redis
+
+#### Connect to Redis on Redis Enterprise Cloud
+
+```powershell
+# To begin, pull the redis docker image and run it with default options:
+docker pull redis
+docker run -d --name redisdb redis
+docker exec -it redisdb bash
+
+# This gives you a bash prompt running within your Docker image. From here, you can connect to your database
+# Replace <endpoint>, <port>, and <password> with the ones of your redis database
+redis-cli -h <endpoint> -p <port> -a <password>
+```
+
+#### Connect to Redis on a Local Docker Container Running Redis Server
+
+```powershell
+# To begin, pull the redis docker image and run it with default options:
+docker pull redis
+docker run -d --name redisdb redis
+
+# Connect to the Redis server running inside the local docker container
+docker exec -it redisdb bash
+redis-cli
 ```
